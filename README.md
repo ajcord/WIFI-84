@@ -6,103 +6,76 @@
 
 This project aims to provide direct Internet access to TI-84 calculators
 using an inexpensive ESP8266 module as a wireless modem.
-It will support calculators with I/O ports, i.e. those up to the TI-84+CSE.
+It supports calculators with I/O ports, i.e. those up to the TI-84+CSE.
+
 
 ## Architecture
 
-The project will consist of three main parts:
+The project consists of four main parts:
 
 1. A physical interface between the calculator and ESP8266
 2. A driver for communicating between them
 3. A high-level networking API exposed to calculator programs
-
-Possible implementations for these are currently being considered.
-Some of the ideas are in the following section.
-
-
-
-## Architecture
+4. A small collection of sample utilities using the API
 
 
 ### Physical interface
 
-The main concerns here are power and communication.
-For power, the primary options are either USB or an external battery.
-For communication, the primary options are either USB or the 2.5mm I/O port.
+The adapter is powered from the calculator's USB port for convenience.
+It could probably also be powered from e.g. a USB phone charger,
+as long as the power supply is not noisy.
+The USB's 5V gets converted to 3.3V using an efficient switching regulator
+to save battery.
 
-USB communication would be preferable to maintain forward compatibility
-with the TI-84+CE, which lacks the I/O port.
-However, since the CE's USB controller is completely different IP
-than the older 84s, the driver would have to be mostly rewritten anyway.
-I/O is the simplest option.
+For communication, the adapter uses the I/O port for simplicity.
+Ideally, it would use the USB port for forward compatibility and since
+it already uses it for power;
+however, writing a USB driver would be a lot of effort for very little gain,
+considering that the TI-84+CE uses a completely different USB controller.
 
-Having an external battery pack would be suboptimal,
-so USB power makes the most sense.
-The USB port can only supply up to 100mA,
-which is less than the ESP8266's maximum draw,
-but the transmit power can be lowered in software to decrease current usage.
-An efficienct buck converter, such as TR05S3V3, can minimize power loss.
-In addition, to save the calculator's batteries,
-the ESP8266 can use deep sleep mode whenever possible.
-
-Current consensus: USB power + I/O communication
+It would be nice to have the adapter plug directly into the calculator,
+but I can't seem to find any 2.5mm male headphone connectors,
+and the only USB mini-B male connector I found is vertical.
+Instead, the adapter plugs in using cables,
+but is laid out to make it easy to switch to a plug-oriented design later.
+See the `hardware` folder for the schematic and circuit board.
 
 
 ### Driver
 
-The ESP8266 itself would likely run its standard AT firmware
-or an equivalent for the sake of simplicity.
-It should be able to do everything needed fairly easily.
-The main difficulty is with sending commands from the calculator.
+The ESP8266 runs firmware that directly communicates with the calculator
+using the [ArTICL](https://github.com/KermMartian/ArTICL) library.
+It acts as a CBL2 device to make communication easy with TI Basic programs.
 
-If using USB, communication would most likely occur over a PL2303
-USB serial cable because a Linux driver for this chip is available
-as a reference.
-However, writing a USB driver is non-trivial, and hardware documentation
-is sparse for the calculators' USB interfaces.
-Using usb8x could help speed up development time,
-but it is not available for the newer calculators.
-There appears to be an ongoing community effort to understand
-the TI-84+CE's USB port, however.
-
-Alternatively, using the I/O port, there could be an ATtiny or similar IC
-that interprets the TI link protocol and sends the equivalent serial commands
-to the ESP8266.
-As mentioned above, this would preclude calculators such as the TI-84+CE
-that lack the I/O port,
-and it would likely have issues with buffer space due to the communication
-speed mismatch between the calculator and the ESP8266.
-
-Another possibility using the I/O port would be to write custom ESP8266 firmware
-using the [ArTICL](https://github.com/KermMartian/ArTICL) library
-to communicate with the calculator directly over the TI link protocol.
-This enables larger buffer space due to the ESP8266's more plentiful resources.
-It decreases the software complexity on the calculator to the point that
-even TI-Basic programs could use the modem.
-
-Current consensus: custom ESP8266 firmware
+The calculator does not need a driver since it uses the CBL2
+Get( and Send( commands.
 
 
 ### API
 
-This portion is fairly flexible.
-All it really needs to do is send AT commands over either the USB or I/O port
-and pass the result back to the caller.
-If using custom firmware, it needs to follow the equivalent protocol
-that is implemented.
+The API exposed to the calculator is still in flux,
+but it will provide similar capabilities to the ESP8266's default AT firmware.
+The calculator will be able to send string variables containing API calls,
+and then it will request another variable to get the result (if applicable).
 
-The easiest way would be to support CBL variable transfer with ArTICL.
-Then any program or app could use a defined API for
-communicating with the ESP8266 using strings or other variables.
-However, this is rather inflexible.
+The calculator will send token strings as commands
+in order to save program space.
+The ESP8266 will respond with ASCII strings or real numbers,
+depending on the call.
 
-Another way would be to provide a header file that can be included
-with each program needing a Wi-Fi connection.
-It would likely bear resemblance to the Arduino ESP8266 WiFi API.
-This has the disadvantage of tight coupling and inflexibility.
-It would only be necessary in the case of a specialized serial driver.
 
-A better possibility would be to provide a dedicated app, similar to usb8x,
-but apparently the signing key has not yet been released for the TI-84+CE.
+### Utilities
 
-Current consensus: CBL
+There will need to be a program to allow the user to connect to
+nearby Wi-Fi networks.
+It can be as simple as a menu of SSIDs.
+
+Also, a tool like wget/curl would be useful for testing.
+It would probably have to include its own viewer to display the response
+incrementally due to limited RAM.
+For HTML, maybe it could have the option to display it with tags stripped
+so that it looks sort of like a webpage.
+
+In the future, it would be really cool to have the ESP8266 pre-render webpages
+and have the calculator display them screen by screen.
+A Slack client would also be neat.
