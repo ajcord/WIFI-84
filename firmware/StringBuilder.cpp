@@ -1,16 +1,23 @@
 #include "StringBuilder.h"
 
-StringBuilder::StringBuilder(uint8_t* data) {
+StringBuilder::StringBuilder(uint8_t* data, int maxlen) {
     _data = data;
+    _maxlen = maxlen;
     _pos = 0;
     _tokenLen = 0;
 }
 
 bool StringBuilder::append(Token::Token t) {
     if (t & 0xff00) {
+        if (_maxlen - _pos < 2) {
+            return false;
+        }
         _data[_pos++] = (t & 0xff00) >> 8;
         _data[_pos++] = (t & 0xff);
     } else {
+        if (_maxlen - _pos < 1) {
+            return false;
+        }
         _data[_pos++] = (t & 0xff);
     }
     _tokenLen += 1;

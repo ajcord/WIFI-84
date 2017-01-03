@@ -13,7 +13,8 @@ const int maxDataLen = 512;
 uint8_t header[16];
 uint8_t data[maxDataLen];
 
-uint8_t pendingString[maxDataLen - 2];
+const int maxPendingStringLen = maxDataLen - 2;
+uint8_t pendingString[maxPendingStringLen];
 int pendingStringLen;
 int pendingStringTokenLen;
 
@@ -44,7 +45,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         int num = WiFi.scanNetworks();
         // Build a CSV of network info.
         // Columns are separated by commas and rows by slashes.
-        StringBuilder sb(pendingString);
+        StringBuilder sb(pendingString, maxPendingStringLen);
         for (int i = 0; i < num; i++) {
             int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
             sb.append(

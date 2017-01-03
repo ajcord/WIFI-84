@@ -5,7 +5,7 @@
 
 class StringBuilder {
 public:
-    StringBuilder(uint8_t* data);
+    StringBuilder(uint8_t* data, int maxlen);
     bool append(Token::Token t);
     bool append(char c);
     bool append(String s);
@@ -14,6 +14,7 @@ public:
 
 private:
     uint8_t* _data;
+    int _maxlen;
     int _pos;
     int _tokenLen;
 };
