@@ -1,16 +1,10 @@
 #include "TokenParser.h"
 
-TokenParser::TokenParser(uint8_t* data, int datalen) {
+TokenParser::TokenParser(uint8_t* data) {
     _data = data;
-    _datalen = datalen;
 }
 
 Token::Token TokenParser::nextToken() {
-    int remaining = _datalen - _pos;
-    if (remaining <= 0) {
-        return Token::Invalid;
-    }
-
     Token::Token tok;
     if (isA2ByteTok(_data[_pos])) {
         tok = static_cast<Token::Token>(_data[_pos+1] << 8 | _data[_pos]);

@@ -32,7 +32,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         return -1;
     }
 
-    TokenParser parser(data, datalen);
+    TokenParser parser(data);
     Token::Token tok = parser.nextToken();
     if (tok == Token::Connected) {
         pendingReal = WiFi.status();

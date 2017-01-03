@@ -15,12 +15,11 @@ namespace Token {
 
 class TokenParser {
 public:
-    TokenParser(uint8_t* data, int datalen);
+    TokenParser(uint8_t* data);
     Token::Token nextToken();
 
 private:
     uint8_t* _data;
-    int _datalen;
     int _pos;
 
     bool isA2ByteTok(uint8_t c);
