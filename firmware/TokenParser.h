@@ -22,5 +22,5 @@ private:
     uint8_t* _data;
     int _pos;
 
-    bool isA2ByteTok(uint8_t c);
+    bool isA2ByteTok(uint8_t a);
 };
