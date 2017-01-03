@@ -2,6 +2,7 @@
 #include <CBL2.h>
 #include <TIVar.h>
 #include "TokenParser.h"
+#include "Tokens.h"
 #include "StringBuilder.h"
 
 CBL2 cbl;

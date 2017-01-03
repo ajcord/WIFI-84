@@ -38,7 +38,7 @@ bool StringBuilder::append(char c) {
 
     // Map lowercase letters
     if (c >= 'a' && c <= 'z') {
-        char mapped = c - 'a' + (char)Token::a;
+        char mapped = c - 'a' + (char)Token::LowerA;
         return append((Token::Token) mapped);
     }
 
