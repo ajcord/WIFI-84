@@ -17,18 +17,32 @@ Token::Token TokenParser::nextToken() {
     }
 }
 
+enum {
+    tVarMat                 = 0x5c,
+    tVarLst                 = 0x5d,
+    tVarEqu                 = 0x5e,
+    tVarPict                = 0x60,
+    tVarGDB                 = 0x61,
+    tVarOut                 = 0x62,
+    tVarSys                 = 0x63,
+    tGFormat                = 0x7e,
+    tVarStrng               = 0xaa,
+    t2ByteTok               = 0xbb,
+    tNew2ByteTok            = 0xef,
+} twoByteTokenPrefixes;
+
 bool TokenParser::isA2ByteTok(uint8_t a) {
     return (
-        a == 0x5c ||
-        a == 0x5d ||
-        a == 0x5e ||
-        a == 0x60 ||
-        a == 0x61 ||
-        a == 0x62 ||
-        a == 0x63 ||
-        a == 0x7e ||
-        a == 0xaa ||
-        a == 0xbb ||
-        a == 0xef
+        a == tVarMat        ||
+        a == tVarLst        ||
+        a == tVarEqu        ||
+        a == tVarPict       ||
+        a == tVarGDB        ||
+        a == tVarOut        ||
+        a == tVarSys        ||
+        a == tGFormat       ||
+        a == tVarStrng      ||
+        a == t2ByteTok      ||
+        a == tNew2ByteTok
     );
 }
