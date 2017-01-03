@@ -24,7 +24,7 @@ bool StringBuilder::append(Token::Token t) {
     return true;
 }
 
-bool StringBuilder::append(char c) {
+bool StringBuilder::append(uint8_t c) {
     // Reject control characters and 8-bit codes
     if (c < 0x20 || c >= 0x7f) {
         return false;

@@ -7,7 +7,7 @@ class StringBuilder {
 public:
     StringBuilder(uint8_t* data, int maxlen);
     bool append(Token::Token t);
-    bool append(char c);
+    bool append(uint8_t c);
     bool append(String s);
     int length();
     int tokenLength();
