@@ -47,7 +47,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         StringBuilder sb(pendingString);
         for (int i = 0; i < num; i++) {
             int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
-            sb.insert(
+            sb.append(
                 WiFi.SSID(i) + ',' + needPassword + ',' + WiFi.RSSI(i) + '/'
             );
         }

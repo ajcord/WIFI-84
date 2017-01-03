@@ -6,7 +6,7 @@ StringBuilder::StringBuilder(uint8_t* data) {
     _tokenLen = 0;
 }
 
-bool StringBuilder::insert(Token::Token t) {
+bool StringBuilder::append(Token::Token t) {
     if (t & 0xff00) {
         _data[_pos++] = (t & 0xff00) >> 8;
         _data[_pos++] = (t & 0xff);
@@ -17,7 +17,7 @@ bool StringBuilder::insert(Token::Token t) {
     return true;
 }
 
-bool StringBuilder::insert(char c) {
+bool StringBuilder::append(char c) {
     // Reject control characters and 8-bit codes
     if (c < 0x20 || c >= 0x7f) {
         return false;
@@ -26,91 +26,91 @@ bool StringBuilder::insert(char c) {
     // Map basic characters (0-9, A-Z) directly
     if ((c >= '0' && c <= '9') ||
         (c >= 'A' && c <= 'Z')) {
-        return insert((Token::Token) c);
+        return append((Token::Token) c);
     }
 
     // Map lowercase letters
     if (c >= 'a' && c <= 'z') {
         char mapped = c - 'a' + (char)Token::a;
-        return insert((Token::Token) mapped);
+        return append((Token::Token) mapped);
     }
 
     // Map punctuation
     switch (c) {
         case ' ':
-            return insert(Token::Space);
+            return append(Token::Space);
         case '!':
-            return insert(Token::ExclPoint);
+            return append(Token::ExclPoint);
         case '\"':
-            return insert(Token::DoubleQuote);
+            return append(Token::DoubleQuote);
         case '#':
-            return insert(Token::Pound);
+            return append(Token::Pound);
         case '$':
-            return insert(Token::Dollar);
+            return append(Token::Dollar);
         case '%':
-            return insert(Token::Percent);
+            return append(Token::Percent);
         case '&':
-            return insert(Token::Ampersand);
+            return append(Token::Ampersand);
         case '\'':
-            return insert(Token::SingleQuote);
+            return append(Token::SingleQuote);
         case '(':
-            return insert(Token::LParen);
+            return append(Token::LParen);
         case ')':
-            return insert(Token::RParen);
+            return append(Token::RParen);
         case '*':
-            return insert(Token::Times);
+            return append(Token::Times);
         case '+':
-            return insert(Token::Plus);
+            return append(Token::Plus);
         case ',':
-            return insert(Token::Comma);
+            return append(Token::Comma);
         case '-':
-            return insert(Token::Minus);
+            return append(Token::Minus);
         case '.':
-            return insert(Token::Period);
+            return append(Token::Period);
         case '/':
-            return insert(Token::Divide);
+            return append(Token::Divide);
         case ':':
-            return insert(Token::Colon);
+            return append(Token::Colon);
         case ';':
-            return insert(Token::Semicolon);
+            return append(Token::Semicolon);
         case '<':
-            return insert(Token::LessThan);
+            return append(Token::LessThan);
         case '=':
-            return insert(Token::Equals);
+            return append(Token::Equals);
         case '>':
-            return insert(Token::GreaterThan);
+            return append(Token::GreaterThan);
         case '?':
-            return insert(Token::QuestionMk);
+            return append(Token::QuestionMk);
         case '@':
-            return insert(Token::At);
+            return append(Token::At);
         case '[':
-            return insert(Token::LBracket);
+            return append(Token::LBracket);
         case '\\':
-            return insert(Token::Backslash);
+            return append(Token::Backslash);
         case ']':
-            return insert(Token::RBracket);
+            return append(Token::RBracket);
         case '^':
-            return insert(Token::Caret);
+            return append(Token::Caret);
         case '_':
-            return insert(Token::Underscore);
+            return append(Token::Underscore);
         case '`':
-            return insert(Token::Backtick);
+            return append(Token::Backtick);
         case '{':
-            return insert(Token::LBrace);
+            return append(Token::LBrace);
         case '|':
-            return insert(Token::Pipe);
+            return append(Token::Pipe);
         case '}':
-            return insert(Token::RBrace);
+            return append(Token::RBrace);
         case '~':
-            return insert(Token::Tilde);
+            return append(Token::Tilde);
     }
 
     return false; // Should never happen
 }
 
-bool StringBuilder::insert(String s) {
+bool StringBuilder::append(String s) {
     for (int i = 0; i < s.length(); i++) {
-        if (!insert(s[i])) {
+        if (!append(s[i])) {
             return false;
         }
     }

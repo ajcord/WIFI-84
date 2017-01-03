@@ -6,9 +6,9 @@
 class StringBuilder {
 public:
     StringBuilder(uint8_t* data);
-    bool insert(Token::Token t);
-    bool insert(char c);
-    bool insert(String s);
+    bool append(Token::Token t);
+    bool append(char c);
+    bool append(String s);
     int length();
     int tokenLength();
 
