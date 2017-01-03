@@ -35,7 +35,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
     TokenParser parser(data);
     Token::Token tok = parser.nextToken();
     if (tok == Token::Connected) {
-        pendingReal = WiFi.status();
+        pendingReal = (WiFi.status() == WL_CONNECTED);
     } else if (tok == Token::Disp) {
         int num = WiFi.scanNetworks();
         // Build a CSV of network info
