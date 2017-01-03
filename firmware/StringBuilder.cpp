@@ -44,72 +44,39 @@ bool StringBuilder::append(char c) {
 
     // Map punctuation
     switch (c) {
-        case ' ':
-            return append(Token::Space);
-        case '!':
-            return append(Token::ExclPoint);
-        case '\"':
-            return append(Token::DoubleQuote);
-        case '#':
-            return append(Token::Pound);
-        case '$':
-            return append(Token::Dollar);
-        case '%':
-            return append(Token::Percent);
-        case '&':
-            return append(Token::Ampersand);
-        case '\'':
-            return append(Token::SingleQuote);
-        case '(':
-            return append(Token::LParen);
-        case ')':
-            return append(Token::RParen);
-        case '*':
-            return append(Token::Times);
-        case '+':
-            return append(Token::Plus);
-        case ',':
-            return append(Token::Comma);
-        case '-':
-            return append(Token::Minus);
-        case '.':
-            return append(Token::Period);
-        case '/':
-            return append(Token::Divide);
-        case ':':
-            return append(Token::Colon);
-        case ';':
-            return append(Token::Semicolon);
-        case '<':
-            return append(Token::LessThan);
-        case '=':
-            return append(Token::Equals);
-        case '>':
-            return append(Token::GreaterThan);
-        case '?':
-            return append(Token::QuestionMk);
-        case '@':
-            return append(Token::At);
-        case '[':
-            return append(Token::LBracket);
-        case '\\':
-            return append(Token::Backslash);
-        case ']':
-            return append(Token::RBracket);
-        case '^':
-            return append(Token::Caret);
-        case '_':
-            return append(Token::Underscore);
-        case '`':
-            return append(Token::Backtick);
-        case '{':
-            return append(Token::LBrace);
-        case '|':
-            return append(Token::Pipe);
-        case '}':
-            return append(Token::RBrace);
-        case '~':
-            return append(Token::Tilde);
+        case ' ':   return append(Token::Space);
+        case '!':   return append(Token::ExclPoint);
+        case '\"':  return append(Token::DoubleQuote);
+        case '#':   return append(Token::Pound);
+        case '$':   return append(Token::Dollar);
+        case '%':   return append(Token::Percent);
+        case '&':   return append(Token::Ampersand);
+        case '\'':  return append(Token::SingleQuote);
+        case '(':   return append(Token::LParen);
+        case ')':   return append(Token::RParen);
+        case '*':   return append(Token::Times);
+        case '+':   return append(Token::Plus);
+        case ',':   return append(Token::Comma);
+        case '-':   return append(Token::Minus);
+        case '.':   return append(Token::Period);
+        case '/':   return append(Token::Divide);
+        case ':':   return append(Token::Colon);
+        case ';':   return append(Token::Semicolon);
+        case '<':   return append(Token::LessThan);
+        case '=':   return append(Token::Equals);
+        case '>':   return append(Token::GreaterThan);
+        case '?':   return append(Token::QuestionMk);
+        case '@':   return append(Token::At);
+        case '[':   return append(Token::LBracket);
+        case '\\':  return append(Token::Backslash);
+        case ']':   return append(Token::RBracket);
+        case '^':   return append(Token::Caret);
+        case '_':   return append(Token::Underscore);
+        case '`':   return append(Token::Backtick);
+        case '{':   return append(Token::LBrace);
+        case '|':   return append(Token::Pipe);
+        case '}':   return append(Token::RBrace);
+        case '~':   return append(Token::Tilde);
     }
 
     return false; // Should never happen
