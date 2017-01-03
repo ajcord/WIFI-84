@@ -38,8 +38,8 @@ bool StringBuilder::append(char c) {
 
     // Map lowercase letters
     if (c >= 'a' && c <= 'z') {
-        char mapped = c - 'a' + (char)Token::LowerA;
-        return append((Token::Token) mapped);
+        Token::Token mapped = (Token::Token)(c - 'a' + Token::LowerA);
+        return append(mapped);
     }
 
     // Map punctuation

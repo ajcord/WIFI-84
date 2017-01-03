@@ -7,11 +7,11 @@ TokenParser::TokenParser(uint8_t* data) {
 Token::Token TokenParser::nextToken() {
     Token::Token tok;
     if (isA2ByteTok(_data[_pos])) {
-        tok = static_cast<Token::Token>(_data[_pos+1] << 8 | _data[_pos]);
+        tok = (Token::Token)(_data[_pos+1] << 8 | _data[_pos]);
         _pos += 2;
         return tok;
     } else {
-        tok = static_cast<Token::Token>(_data[_pos]);
+        tok = (Token::Token)(_data[_pos]);
         _pos += 1;
         return tok;
     }
