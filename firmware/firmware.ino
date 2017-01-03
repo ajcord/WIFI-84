@@ -2,6 +2,7 @@
 #include <CBL2.h>
 #include <TIVar.h>
 #include "TokenParser.h"
+#include "StringBuilder.h"
 
 CBL2 cbl;
 
@@ -45,7 +46,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
             csv.concat(WiFi.SSID(i) + String((char)Token::Times) +
                        needPassword + String((char)Token::Times) +
-                       WiFi.RSSI(i) + String((char)Token::Div));
+                       WiFi.RSSI(i) + String((char)Token::Divide));
         }
         pendingString = csv;
     }
