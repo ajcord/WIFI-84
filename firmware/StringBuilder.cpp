@@ -2,6 +2,8 @@
 
 StringBuilder::StringBuilder(uint8_t* data) {
     _data = data;
+    _pos = 0;
+    _tokenLen = 0;
 }
 
 bool StringBuilder::insert(Token::Token t) {
@@ -11,6 +13,7 @@ bool StringBuilder::insert(Token::Token t) {
     } else {
         _data[_pos++] = (t & 0xff);
     }
+    _tokenLen += 1;
     return true;
 }
 
@@ -116,4 +119,8 @@ bool StringBuilder::insert(String s) {
 
 int StringBuilder::length() {
     return _pos;
+}
+
+int StringBuilder::tokenLength() {
+    return _tokenLen;
 }

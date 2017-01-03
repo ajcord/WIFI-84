@@ -10,8 +10,10 @@ public:
     bool insert(char c);
     bool insert(String s);
     int length();
+    int tokenLength();
 
 private:
     uint8_t* _data;
     int _pos;
+    int _tokenLen;
 };

@@ -13,7 +13,10 @@ const int maxDataLen = 512;
 uint8_t header[16];
 uint8_t data[maxDataLen];
 
-String pendingString;
+uint8_t pendingString[maxDataLen - 2];
+int pendingStringLen;
+int pendingStringTokenLen;
+
 long pendingReal;
 
 void setup() {
@@ -39,16 +42,17 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         pendingReal = (WiFi.status() == WL_CONNECTED);
     } else if (tok == Token::Disp) {
         int num = WiFi.scanNetworks();
-        // Build a CSV of network info
-        // Columns are separated by the * token and rows by the / token
-        String csv;
+        // Build a CSV of network info.
+        // Columns are separated by commas and rows by slashes.
+        StringBuilder sb(pendingString);
         for (int i = 0; i < num; i++) {
             int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
-            csv.concat(WiFi.SSID(i) + String((char)Token::Times) +
-                       needPassword + String((char)Token::Times) +
-                       WiFi.RSSI(i) + String((char)Token::Divide));
+            sb.insert(
+                WiFi.SSID(i) + ',' + needPassword + ',' + WiFi.RSSI(i) + '/'
+            );
         }
-        pendingString = csv;
+        pendingStringLen = sb.length();
+        pendingStringTokenLen = sb.tokenLength();
     }
     return 0;
 }
@@ -58,14 +62,12 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
               data_callback* data_callback) {
     switch(type) {
         case VarTypes82::VarString: {
-            int tokenlen = pendingString.length(); // FIXME
-            TIVar::intToSizeWord(tokenlen, data);
-            int len = pendingString.length();
-            *datalen = len + 2;
-            memcpy(data + 2, pendingString.c_str(), len);
+            TIVar::intToSizeWord(pendingStringTokenLen, data);
+            *datalen = pendingStringLen + 2;
+            memcpy(data + 2, pendingString, pendingStringLen);
 
             memset(header, 0, sizeof(header));
-            TIVar::intToSizeWord(len, header);
+            TIVar::intToSizeWord(pendingStringLen, header);
             header[2] = VarTypes82::VarString; // Variable type
             header[3] = 0xAA; // Variable name (Str1)
             header[4] = 0x00; // ^
