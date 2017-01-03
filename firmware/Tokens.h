@@ -26,6 +26,7 @@ namespace Token {
         SingleQuote = 0xae,
         QuestionMk  = 0xaf,
         LowerA      = 0xbbb0,
+        LowerL      = 0xbbbc,
         Tilde       = 0xbbcf,
         At          = 0xbbd1,
         Pound       = 0xbbd2,
@@ -36,7 +37,7 @@ namespace Token {
         Backslash   = 0xbbd7,
         Pipe        = 0xbbd8,
         Underscore  = 0xbbd9,
-        Percent     = 0xbbd9,
+        Percent     = 0xbbda,
         Disp        = 0xde,
         Caret       = 0xf0,
     };

@@ -37,8 +37,11 @@ bool StringBuilder::append(uint8_t c) {
     }
 
     // Map lowercase letters
-    if (c >= 'a' && c <= 'z') {
+    if (c >= 'a' && c <= 'k') {
         Token::Token mapped = (Token::Token)(c - 'a' + Token::LowerA);
+        return append(mapped);
+    } else if (c >= 'l' && c <= 'z') {
+        Token::Token mapped = (Token::Token)(c - 'l' + Token::LowerL);
         return append(mapped);
     }
 
