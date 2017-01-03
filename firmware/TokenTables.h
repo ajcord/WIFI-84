@@ -228,26 +228,13 @@ const char* tokenTableEF[257] = {
     "setDate(", "setTime(", "checkTmr(", "setDtFmt(", "setTmFmt(", "timeCnv(", "dayOfWk(", "getDtStr(", "getTmStr(", "getDate", "getTime", "startTmr", "getDtFmt", "getTmFmt", "isClockOn", "ClockOff",
     "ClockOn", "OpenLib(", "ExecLib", "invT(", "chi^2GOF-Test(", "LinRegTInt", "Manual-Fit", "ZQuadrant1", "ZFrac1/2", "ZFrac1/3", "ZFrac1/4", "ZFrac1/5", "ZFrac1/8", "ZFrac1/10", "mathprintbox", NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-#if TOKEN_TABLE_EF_84PCSE || TOKEN_TABLE_EF_84PCE
     ">n/d<>Un/d", ">F<>D", "remainder(", "Sigma(", "logBASE(", "randIntNoRep(", "MATHPRINT", "CLASSIC", "n/d", "Un/d", "AUTO", "DEC", "FRAC", "FRAC-APPROX", NULL, NULL,
     NULL, "BLUE", "RED", "BLACK", "MAGENTA", "GREEN", "ORANGE", "BROWN", "NAVY", "LTBLUE", "YELLOW", "WHITE", "LTGREY", "MEDGREY", "GREY", "DARKGREY",
     "Image1", "Image2", "Image3", "Image4", "Image5", "Image6", "Image7", "Image8", "Image9", "Image0", "Gridline", "BackgroundOn", NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, "BackgroundOff", "GraphColor(", NULL, "TextColor(", "Asm84CPrgm", NULL, "DetectAsymOn", "DetectAsymOff", "BorderColor", NULL, NULL, NULL,
-#else
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-#endif
-#if TOKEN_TABLE_EF_84PCE
     NULL, NULL, NULL, "tinydotplot", "Thin", "Dot-Thin", NULL, NULL, NULL, "PlySmth2", "Asm84CEPrgm", NULL, NULL, NULL, NULL, NULL,
     NULL, "Quartiles Setting...", "u(n-2)", "v(n-2)", "w(n-2)", "u(n-1)", "v(n-1)", "w(n-1)", "u(n)", "v(n)", "w(n)", "u(n+1)", "v(n+1)", "w(n+1)", "pieceWise(", "SEQ(n)",
     "SEQ(n+1)", "SEQ(n+2)", "LEFT", "CENTER", "RIGHT", "invBinom(", "Wait", "toString(", "eval", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-#else
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-#endif
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,

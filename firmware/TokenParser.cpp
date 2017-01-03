@@ -4,8 +4,6 @@
 #define TOKEN_TABLE_7E          1
 #define TOKEN_TABLE_BB          1
 #define TOKEN_TABLE_EF          1
-#define TOKEN_TABLE_EF_84PCSE   0
-#define TOKEN_TABLE_EF_84PCE    0
 #include "TokenTables.h"
 
 namespace Token {

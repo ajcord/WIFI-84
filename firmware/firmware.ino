@@ -38,13 +38,16 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         pendingReal = WiFi.status();
     } else if (tok == Token::Disp) {
         int num = WiFi.scanNetworks();
-        String str;
+        // Build a CSV of network info
+        // Columns are separated by the * token and rows by the / token
+        String csv;
         for (int i = 0; i < num; i++) {
-            str.concat(WiFi.SSID(i) + "\x82" +
-                       WiFi.encryptionType(i) + "\x82" +
-                       WiFi.RSSI(i) + "\x83");
+            int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
+            csv.concat(WiFi.SSID(i) + String((char)Token::Times) +
+                       needPassword + String((char)Token::Times) +
+                       WiFi.RSSI(i) + String((char)Token::Div));
         }
-        pendingString = str;
+        pendingString = csv;
     }
     return 0;
 }

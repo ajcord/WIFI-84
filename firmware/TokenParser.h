@@ -8,6 +8,8 @@ namespace Token {
         // GetKey = 0xAD,
         Disp = 0xDE,
         Connected = 0x7E06,
+        Times = 0x82,
+        Div = 0x83,
     };
 
     int size(Token t);
