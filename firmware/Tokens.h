@@ -7,6 +7,8 @@ namespace Token {
         Select      = 0xbb58,
         For         = 0xd3,
         Stop        = 0xd9,
+        IS          = 0xda,
+        DS          = 0xdb,
         Menu        = 0xe6,
         Send        = 0xe7,
         Get         = 0xe8,

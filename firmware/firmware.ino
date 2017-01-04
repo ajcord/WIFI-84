@@ -190,14 +190,14 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         }
 
         /**
-         * Send data over the current connection.
+         * Transmit data over the current connection.
          * 
-         * Syntax: Send(data)
+         * Syntax: DS<(data)
          * Where data is the text to send.
          * 
          * Returns nothing.
          */
-        case Token::Send: {
+        case Token::DS: {
             if (isUDP) {
                 udpClient.beginPacket(udpAddr.c_str(), udpPort);
                 udpClient.write(params.c_str(), params.length());
@@ -208,13 +208,13 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         }
 
         /**
-         * Gets data from the current connection.
+         * Receive data from the current connection.
          * 
-         * Syntax: Get()
+         * Syntax: IS>()
          * 
          * Returns the data received, if any, in Str1.
          */
-         case Token::Get: {
+         case Token::IS: {
             if (isUDP) {
                 int len = udpClient.parsePacket();
                 uint8_t* buf = (uint8_t*)malloc(len);
