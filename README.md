@@ -60,7 +60,7 @@ and then it will request another variable to get the result (if applicable).
 
 The calculator will send token strings as commands
 in order to save program space.
-The ESP8266 will respond with ASCII strings or real numbers,
+The ESP8266 will respond with token strings or real numbers,
 depending on the call.
 
 
@@ -69,6 +69,8 @@ depending on the call.
 There will need to be a program to allow the user to connect to
 nearby Wi-Fi networks.
 It can be as simple as a menu of SSIDs.
+By including such a program, applications won't need to
+reinvent the wheel, and the connection can be managed centrally.
 
 Also, a tool like wget/curl would be useful for testing.
 It would probably have to include its own viewer to display the response
