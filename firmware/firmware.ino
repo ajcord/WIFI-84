@@ -78,6 +78,8 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
                 case WL_CONNECT_FAILED: pendingReal = 3; break;
                 case WL_IDLE_STATUS:    pendingReal = 4; break;
             }
+            pendingString = WiFi.SSID();
+            Serial.println("Connected to: " + pendingString);
             Serial.println("Connection status: " + pendingReal);
             break;
         }
