@@ -49,6 +49,7 @@ It acts as a CBL2 device to make communication easy with TI Basic programs.
 
 The calculator does not need a driver since it uses the CBL2
 Get( and Send( commands.
+It does, however, need a way to turn on and off the USB port.
 
 
 ### API
