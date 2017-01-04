@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
 #include <CBL2.h>
 #include <TIVar.h>
 #include "TokenParser.h"
@@ -15,6 +16,14 @@ uint8_t data[maxDataLen];
 
 String pendingString;
 long pendingReal;
+
+WiFiClient tcpClient;
+WiFiUDP udpClient;
+
+// For artificial UDP connection management
+bool isUDP;
+String udpAddr;
+uint16_t udpPort;
 
 void setup() {
     Serial.begin(115200);
@@ -37,11 +46,18 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         return -1;
     }
 
+    String params = TIVar::strVarToString8x(data, model);
+    if (params.endsWith(")")) {
+        params = params.substring(1, params.length() - 1);
+    } else {
+        params = params.substring(1);
+    }
+
     TokenParser parser(&data[2]);
     Token::Token tok = parser.nextToken();
     switch (tok) {
         /**
-         * Get connection status.
+         * Get Wi-Fi connection status.
          * 
          * Syntax: Connected
          * 
@@ -101,7 +117,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         }
 
         /**
-         * Connects to an access point.
+         * Connect to an access point.
          * 
          * Syntax: Select(ssid)
          * Alternate: Select(ssid,password)
@@ -109,22 +125,111 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
          * Returns nothing. Use "Connected" to get the result.
          */
         case Token::Select: {
-            String s = TIVar::strVarToString8x(data, model);
-            if (s.endsWith(")")) {
-                s = s.substring(1, s.length() - 1);
-            } else {
-                s = s.substring(1);
-            }
-            int commaIndex = s.indexOf(",");
+            int commaIndex = params.indexOf(",");
             if (commaIndex != -1) {
-                String ssid = s.substring(0, commaIndex);
-                String pass = s.substring(commaIndex + 1);
+                String ssid = params.substring(0, commaIndex);
+                String pass = params.substring(commaIndex + 1);
                 WiFi.begin(ssid.c_str(), pass.c_str());
             } else {
-                WiFi.begin(s.c_str());
+                WiFi.begin(params.c_str());
             }
             break;
         }
+
+        /**
+         * Connect to a TCP or UDP server.
+         * 
+         * Syntax: For(type,addr,port)
+         * Where:
+         * - type = 0 for UDP, 1 for TCP
+         * - addr = remote IP address or hostname
+         * - port = remote port
+         * 
+         * Returns A = 1 on success or 0 on failure.
+         * Note that UDP connections are artificial and always succeed unless
+         * no sockets are available.
+         * 
+         * TODO: eventually would like to support multiple connections,
+         * like sockets. Shouldn't be that bad with an array of WiFiClients
+         * and a Berkeley-style interface.
+         */
+        case Token::For: {
+            int firstCommaIndex = params.indexOf(",");
+            int lastCommaIndex = params.lastIndexOf(",");
+            if (firstCommaIndex == lastCommaIndex) {
+                break;
+            }
+            int type = params.substring(0, firstCommaIndex).toInt();
+            String addr = params.substring(firstCommaIndex + 1, lastCommaIndex);
+            uint16_t port = params.substring(lastCommaIndex + 1).toInt();
+            if (type) {
+                isUDP = false;
+                pendingReal = tcpClient.connect(addr.c_str(), port);
+            } else {
+                udpAddr = addr;
+                udpPort = port;
+                // For simplicity, use the remote port as the local port too
+                pendingReal = udpClient.begin(port);
+                isUDP = pendingReal;
+            }
+        }
+
+        /**
+         * Closes a connection.
+         * 
+         * Syntax: Stop
+         * 
+         * Returns nothing.
+         */
+        case Token::Stop: {
+            if (isUDP) {
+                udpClient.stop();
+            } else {
+                tcpClient.stop();
+            }
+        }
+
+        /**
+         * Send data over the current connection.
+         * 
+         * Syntax: Send(data)
+         * Where data is the text to send.
+         * 
+         * Returns nothing.
+         */
+        case Token::Send: {
+            if (isUDP) {
+                udpClient.beginPacket(udpAddr.c_str(), udpPort);
+                udpClient.write(params.c_str(), params.length());
+                udpClient.endPacket();
+            } else {
+                tcpClient.print(params);
+            }
+        }
+
+        /**
+         * Gets data from the current connection.
+         * 
+         * Syntax: Get()
+         * 
+         * Returns the data received, if any, in Str1.
+         */
+         case Token::Get: {
+            if (isUDP) {
+                int len = udpClient.parsePacket();
+                uint8_t* buf = (uint8_t*)malloc(len);
+                udpClient.read(buf, len);
+                pendingString = String((const char*)buf);
+                // Only valid if String constructor makes a copy.
+                // TODO: verify this.
+                free(buf);
+            } else {
+                pendingString = "";
+                while (tcpClient.available()) {
+                    pendingString.concat(tcpClient.read());
+                }
+            }
+         }
     }
     return 0;
 }
