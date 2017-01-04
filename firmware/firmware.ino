@@ -41,8 +41,10 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
     Token::Token tok = parser.nextToken();
     switch (tok) {
         /**
-         * Get connection status
-         * Get("Connected")
+         * Get connection status.
+         * 
+         * Syntax: Connected
+         * 
          * Returns one of the following real values in A:
          * - 0 if connected
          * - 1 if disconnected
@@ -51,6 +53,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
          * - 4 if in between states
          */
         case Token::Connected:
+            pendingReal = -1;
             switch (WiFi.status()) {
                 case WL_CONNECTED:      pendingReal = 0; break;
                 case WL_DISCONNECTED:   pendingReal = 1; break;
@@ -60,20 +63,34 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             }
             Serial.println("Connection status: " + pendingReal);
             break;
+
+        /**
+         * Get a list of nearby access points.
+         * 
+         * Syntax: Menu()
+         * 
+         * Returns a CSV of access points in Str1, in the following format:
+         * ssid1,encryption1,rssi1/ssid2,encryption2,rssi2/...
+         * - ssid is the name of the network
+         * - encryption is an integer enumeration of various security types:
+         *   - 0 = open
+         *   - 1 = WEP
+         *   - 2 = WPA
+         *   - 3 = WPA2
+         *   - 4 = WPA/WPA2 mixed
+         * - rssi is the signal strength in dBm
+         */
         case Token::Menu: {
             int num = WiFi.scanNetworks();
-            // Build a CSV of network info.
-            // Columns are separated by commas and rows by slashes.
             pendingString = "";
             for (int i = 0; i < num; i++) {
-                int encryption;
+                int encryption = -1;
                 switch (WiFi.encryptionType(i)) {
                     case ENC_TYPE_NONE: encryption = 0; break;
                     case ENC_TYPE_WEP:  encryption = 1; break;
                     case ENC_TYPE_TKIP: encryption = 2; break; // WPA
                     case ENC_TYPE_CCMP: encryption = 3; break; // WPA2
                     case ENC_TYPE_AUTO: encryption = 4; break; // WPA/WPA2
-                    default:            encryption = -1; break;
                 }
                 pendingString.concat(
                     WiFi.SSID(i) + ',' + encryption + ',' + WiFi.RSSI(i) + '/'
@@ -82,16 +99,29 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             Serial.println("AP list: " + pendingString);
             break;
         }
+
+        /**
+         * Connects to an access point.
+         * 
+         * Syntax: Select(ssid)
+         * Alternate: Select(ssid,password)
+         * 
+         * Returns nothing. Use "Connected" to get the result.
+         */
         case Token::Select: {
             String s = TIVar::strVarToString8x(data, model);
+            if (s.endsWith(")")) {
+                s = s.substring(1, s.length() - 1);
+            } else {
+                s = s.substring(1);
+            }
             int commaIndex = s.indexOf(",");
             if (commaIndex != -1) {
-                String ssid = WiFi.SSID(s.substring(1, commaIndex).toInt());
+                String ssid = s.substring(0, commaIndex);
                 String pass = s.substring(commaIndex + 1);
                 WiFi.begin(ssid.c_str(), pass.c_str());
             } else {
-                String ssid = WiFi.SSID(s.substring(1).toInt());
-                WiFi.begin(ssid.c_str());
+                WiFi.begin(s.c_str());
             }
             break;
         }
