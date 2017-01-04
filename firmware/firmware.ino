@@ -40,8 +40,24 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
     TokenParser parser(&data[2]);
     Token::Token tok = parser.nextToken();
     switch (tok) {
+        /**
+         * Get connection status
+         * Get("Connected")
+         * Returns one of the following real values in A:
+         * - 0 if connected
+         * - 1 if disconnected
+         * - 2 if SSID cannot be reached
+         * - 3 if password is incorrect
+         * - 4 if in between states
+         */
         case Token::Connected:
-            pendingReal = (WiFi.status() == WL_CONNECTED);
+            switch (WiFi.status()) {
+                case WL_CONNECTED:      pendingReal = 0; break;
+                case WL_DISCONNECTED:   pendingReal = 1; break;
+                case WL_NO_SSID_AVAIL:  pendingReal = 2; break;
+                case WL_CONNECT_FAILED: pendingReal = 3; break;
+                case WL_IDLE_STATUS:    pendingReal = 4; break;
+            }
             Serial.println("Connection status: " + pendingReal);
             break;
         case Token::Menu: {
