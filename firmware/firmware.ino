@@ -132,8 +132,10 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
                 String ssid = params.substring(0, commaIndex);
                 String pass = params.substring(commaIndex + 1);
                 WiFi.begin(ssid.c_str(), pass.c_str());
+                Serial.println("Connecting to \"" + ssid + "\"");
             } else {
                 WiFi.begin(params.c_str());
+                Serial.println("Connecting to \"" + params + "\"");
             }
             break;
         }
@@ -167,12 +169,14 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             if (type) {
                 isUDP = false;
                 pendingReal = tcpClient.connect(addr.c_str(), port);
+                Serial.println("Connecting via TCP to " + addr + ":" + port);
             } else {
                 udpAddr = addr;
                 udpPort = port;
                 // For simplicity, use the remote port as the local port too
                 pendingReal = udpClient.begin(port);
                 isUDP = pendingReal;
+                Serial.println("Connecting via UDP to " + addr + ":" + port);
             }
         }
 
@@ -189,6 +193,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             } else {
                 tcpClient.stop();
             }
+            Serial.println("Connection closed");
         }
 
         /**
@@ -207,6 +212,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             } else {
                 tcpClient.print(params);
             }
+            Serial.println("Sending: " + params);
         }
 
         /**
@@ -230,6 +236,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
                     pendingString.concat(tcpClient.read());
                 }
             }
+            Serial.println("Received: " + pendingString);
          }
 
          /**
@@ -243,12 +250,15 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
          case Token::Get: {
             HTTPClient http;
             http.begin(params);
+            Serial.println("Requesting " + params);
             pendingReal = http.GET();
             if (pendingReal > 0) {
                 pendingString = http.getString();
             } else {
                 pendingString = "";
             }
+            Serial.println("HTTP code: " + pendingReal);
+            Serial.println("Response: " + pendingString);
          }
     }
     return 0;
