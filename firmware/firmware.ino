@@ -65,7 +65,7 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
 
             memset(header, 0, sizeof(header));
             TIVar::intToSizeWord(rval, header);
-            header[2] = VarTypes82::VarString; // Variable type
+            header[2] = type; // Variable type
             header[3] = 0xAA; // Variable name (Str1)
             header[4] = 0x00; // ^
             *headerlen = 13;
@@ -80,8 +80,8 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
 
             memset(header, 0, sizeof(header));
             TIVar::intToSizeWord(rval, header);
-            header[2] = VarTypes82::VarReal; // Variable type
-            header[3] = 'A'; // Variable name (A)
+            header[2] = type; // Variable type
+            header[3] = 0x41; // Variable name (A)
             *headerlen = 13;
             return 0;
         }
