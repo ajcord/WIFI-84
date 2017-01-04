@@ -3,7 +3,6 @@
 #include <TIVar.h>
 #include "TokenParser.h"
 #include "Tokens.h"
-#include "StringBuilder.h"
 
 CBL2 cbl;
 
@@ -14,11 +13,7 @@ const int maxDataLen = 512;
 uint8_t header[16];
 uint8_t data[maxDataLen];
 
-const int maxPendingStringLen = maxDataLen - 2;
-uint8_t pendingString[maxPendingStringLen];
-int pendingStringLen;
-int pendingStringTokenLen;
-
+String pendingString;
 long pendingReal;
 
 void setup() {
@@ -46,15 +41,13 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         int num = WiFi.scanNetworks();
         // Build a CSV of network info.
         // Columns are separated by commas and rows by slashes.
-        StringBuilder sb(pendingString, maxPendingStringLen);
+        pendingString = "";
         for (int i = 0; i < num; i++) {
             int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
-            sb.append(
+            pendingString.concat(
                 WiFi.SSID(i) + ',' + needPassword + ',' + WiFi.RSSI(i) + '/'
             );
         }
-        pendingStringLen = sb.length();
-        pendingStringTokenLen = sb.tokenLength();
     }
     return 0;
 }
@@ -64,12 +57,14 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
               data_callback* data_callback) {
     switch(type) {
         case VarTypes82::VarString: {
-            TIVar::intToSizeWord(pendingStringTokenLen, data);
-            *datalen = pendingStringLen + 2;
-            memcpy(data + 2, pendingString, pendingStringLen);
+            int rval = TIVar::stringToStrVar8x(pendingString, data, model);
+            if (rval < 0) {
+                return -1;
+            }
+            *datalen = rval;
 
             memset(header, 0, sizeof(header));
-            TIVar::intToSizeWord(pendingStringLen, header);
+            TIVar::intToSizeWord(rval, header);
             header[2] = VarTypes82::VarString; // Variable type
             header[3] = 0xAA; // Variable name (Str1)
             header[4] = 0x00; // ^
@@ -77,11 +72,14 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
             return 0;
         }
         case VarTypes82::VarReal: {
-            int len = TIVar::longToReal8x(pendingReal, data, model);
-            *datalen = len;
+            int rval = TIVar::longToReal8x(pendingReal, data, model);
+            if (rval < 0) {
+                return -1;
+            }
+            *datalen = rval;
 
             memset(header, 0, sizeof(header));
-            TIVar::intToSizeWord(len, header);
+            TIVar::intToSizeWord(rval, header);
             header[2] = VarTypes82::VarReal; // Variable type
             header[3] = 'A'; // Variable name (A)
             *headerlen = 13;
