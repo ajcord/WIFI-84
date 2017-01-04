@@ -219,11 +219,10 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
          case Token::IS: {
             if (isUDP) {
                 int len = udpClient.parsePacket();
-                uint8_t* buf = (uint8_t*)malloc(len);
+                uint8_t* buf = (uint8_t*)malloc(len + 1);
                 udpClient.read(buf, len);
+                buf[len] = '\0';
                 pendingString = String((const char*)buf);
-                // Only valid if String constructor makes a copy.
-                // TODO: verify this.
                 free(buf);
             } else {
                 pendingString = "";
