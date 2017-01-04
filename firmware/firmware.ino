@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <ESP8266HTTPClient.h>
 #include <CBL2.h>
 #include <TIVar.h>
 #include "TokenParser.h"
@@ -68,7 +69,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
          * - 3 if password is incorrect
          * - 4 if in between states
          */
-        case Token::Connected:
+        case Token::Connected: {
             pendingReal = -1;
             switch (WiFi.status()) {
                 case WL_CONNECTED:      pendingReal = 0; break;
@@ -79,6 +80,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             }
             Serial.println("Connection status: " + pendingReal);
             break;
+        }
 
         /**
          * Get a list of nearby access points.
@@ -228,6 +230,25 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
                 while (tcpClient.available()) {
                     pendingString.concat(tcpClient.read());
                 }
+            }
+         }
+
+         /**
+          * Gets a URL via HTTP.
+          * 
+          * Syntax: Get(url)
+          * 
+          * Returns the response in Str1 and the HTTP code in A.
+          * A will be negative if there was an error in sending the request.
+          */
+         case Token::Get: {
+            HTTPClient http;
+            http.begin(params);
+            pendingReal = http.GET();
+            if (pendingReal > 0) {
+                pendingString = http.getString();
+            } else {
+                pendingString = "";
             }
          }
     }
