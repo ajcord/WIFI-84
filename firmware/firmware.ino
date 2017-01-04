@@ -17,9 +17,11 @@ String pendingString;
 long pendingReal;
 
 void setup() {
+    Serial.begin(115200);
     cbl.setLines(tipPin, ringPin);
     cbl.resetLines();
     cbl.setupCallbacks(header, data, maxDataLen, onReceived, onRequest);
+    Serial.println("Ready");
 }
 
 void loop() {
@@ -28,8 +30,10 @@ void loop() {
 
 // Called when a variable is received from the calculator
 int onReceived(uint8_t type, enum Endpoint model, int datalen) {
+    Serial.println("Received variable of type " + type);
     if (type != VarTypes82::VarString) {
         // Require strings only
+        Serial.println("Rejected");
         return -1;
     }
 
@@ -37,6 +41,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
     Token::Token tok = parser.nextToken();
     if (tok == Token::Connected) {
         pendingReal = (WiFi.status() == WL_CONNECTED);
+        Serial.println("Connection status: " + pendingReal);
     } else if (tok == Token::Disp) {
         int num = WiFi.scanNetworks();
         // Build a CSV of network info.
@@ -48,6 +53,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
                 WiFi.SSID(i) + ',' + needPassword + ',' + WiFi.RSSI(i) + '/'
             );
         }
+        Serial.println("AP list: " + pendingString);
     }
     return 0;
 }
@@ -55,6 +61,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
 // Called when the calculator requests a variable
 int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
               data_callback* data_callback) {
+    Serial.println("Got request for variable of type " + type);
     switch(type) {
         case VarTypes82::VarString: {
             int rval = TIVar::stringToStrVar8x(pendingString, data, model);
@@ -69,6 +76,7 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
             header[3] = 0xAA; // Variable name (Str1)
             header[4] = 0x00; // ^
             *headerlen = 13;
+            Serial.println("Responding with \"" + pendingString + "\"");
             return 0;
         }
         case VarTypes82::VarReal: {
@@ -83,11 +91,13 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen, int* datalen,
             header[2] = type; // Variable type
             header[3] = 0x41; // Variable name (A)
             *headerlen = 13;
+            Serial.println("Responding with " + pendingReal);
             return 0;
         }
         default:
             *headerlen = 0;
             *datalen = 0;
+            Serial.println("Rejected");
             return -1;
     }
 }
