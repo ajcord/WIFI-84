@@ -37,23 +37,48 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         return -1;
     }
 
-    TokenParser parser(data);
+    TokenParser parser(&data[2]);
     Token::Token tok = parser.nextToken();
-    if (tok == Token::Connected) {
-        pendingReal = (WiFi.status() == WL_CONNECTED);
-        Serial.println("Connection status: " + pendingReal);
-    } else if (tok == Token::Disp) {
-        int num = WiFi.scanNetworks();
-        // Build a CSV of network info.
-        // Columns are separated by commas and rows by slashes.
-        pendingString = "";
-        for (int i = 0; i < num; i++) {
-            int needPassword = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
-            pendingString.concat(
-                WiFi.SSID(i) + ',' + needPassword + ',' + WiFi.RSSI(i) + '/'
-            );
+    switch (tok) {
+        case Token::Connected:
+            pendingReal = (WiFi.status() == WL_CONNECTED);
+            Serial.println("Connection status: " + pendingReal);
+            break;
+        case Token::Menu: {
+            int num = WiFi.scanNetworks();
+            // Build a CSV of network info.
+            // Columns are separated by commas and rows by slashes.
+            pendingString = "";
+            for (int i = 0; i < num; i++) {
+                int encryption;
+                switch (WiFi.encryptionType(i)) {
+                    case ENC_TYPE_NONE: encryption = 0; break;
+                    case ENC_TYPE_WEP:  encryption = 1; break;
+                    case ENC_TYPE_TKIP: encryption = 2; break; // WPA
+                    case ENC_TYPE_CCMP: encryption = 3; break; // WPA2
+                    case ENC_TYPE_AUTO: encryption = 4; break; // WPA/WPA2
+                    default:            encryption = -1; break;
+                }
+                pendingString.concat(
+                    WiFi.SSID(i) + ',' + encryption + ',' + WiFi.RSSI(i) + '/'
+                );
+            }
+            Serial.println("AP list: " + pendingString);
+            break;
         }
-        Serial.println("AP list: " + pendingString);
+        case Token::Select: {
+            String s = TIVar::strVarToString8x(data, model);
+            int commaIndex = s.indexOf(",");
+            if (commaIndex != -1) {
+                String ssid = WiFi.SSID(s.substring(1, commaIndex).toInt());
+                String pass = s.substring(commaIndex + 1);
+                WiFi.begin(ssid.c_str(), pass.c_str());
+            } else {
+                String ssid = WiFi.SSID(s.substring(1).toInt());
+                WiFi.begin(ssid.c_str());
+            }
+            break;
+        }
     }
     return 0;
 }
