@@ -68,6 +68,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
          * - 2 if SSID cannot be reached
          * - 3 if password is incorrect
          * - 4 if in between states
+         * Returns the currently connected SSID, if any, in Str1.
          */
         case Token::Connected: {
             pendingReal = -1;
@@ -183,7 +184,7 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
         }
 
         /**
-         * Closes a connection.
+         * Close the current connection.
          * 
          * Syntax: Stop
          * 
@@ -254,6 +255,31 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen) {
             http.begin(params);
             Serial.println("Requesting " + params);
             pendingReal = http.GET();
+            if (pendingReal > 0) {
+                pendingString = http.getString();
+            } else {
+                pendingString = "";
+            }
+            Serial.println("HTTP code: " + pendingReal);
+            Serial.println("Response: " + pendingString);
+         }
+
+         /**
+          * Posts to a URL via HTTP.
+          * 
+          * Syntax: Send(url,payload)
+          * 
+          * Returns the response in Str1 and the HTTP code in A.
+          * A will be negative if there was an error in sending the request.
+          */
+         case Token::Send: {
+            HTTPClient http;
+            int commaIndex = params.indexOf(",");
+            String url = params.substring(0, commaIndex);
+            String payload = params.substring(commaIndex + 1);
+            http.begin(url);
+            Serial.println("Posting \"" + payload + "\" to " + url);
+            pendingReal = http.POST((uint8_t*)payload.c_str(), payload.length());
             if (pendingReal > 0) {
                 pendingString = http.getString();
             } else {
